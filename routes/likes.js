@@ -4,7 +4,20 @@ const sql = require('../postgres');
 
 // Returns all likes for currently logged in user (will update how to access that later, for now just hardcode)
 router.get('/likes', async function (req, res) {
-	res.send({});
+	const userid = 2;
+	// Example query:
+	/*
+	const users = await sql`
+		SELECT * FROM users where id = ${req.params.id};
+	`;
+	*/
+
+	// Likes query
+	const likes = await sql`
+		SELECT movie_id FROM likes where id = 2;
+	`;
+
+	res.send({likes});
 });
 
 // Returns a specific like given the like id
