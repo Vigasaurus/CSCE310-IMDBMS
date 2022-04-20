@@ -3,7 +3,7 @@ const router = express.Router();
 const sql = require('../postgres');
 
 // Vignesh will handle
-router.post('/login', function (req, res) {
+router.post('/login', async function (req, res) {
 	res.send({});
 });
 
@@ -24,17 +24,17 @@ router.get('/users/:id', async function (req, res) {
 });
 
 // Adds a new user - uses req.body for data input
-router.post('/users', function (req, res) {
+router.post('/users', async function (req, res) {
 	res.send({});
 });
 
 // Updates a user - uses req.body for data input and req.params.id for user id from url
-router.patch('/user/:id', function (req, res) {
+router.patch('/user/:id', async function (req, res) {
 	res.send({});
 });
 
 // Deletes a user - uses req.params.id for user id from url
-router.delete('/user/:id', function (req, res) {
+router.delete('/user/:id', async function (req, res) {
 	res.send({});
 });
 
