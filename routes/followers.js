@@ -1,6 +1,8 @@
 const express = require('express');
 const router = express.Router();
 const sql = require('../postgres');
+// Code made by Jesica Jimenez
+
 
 // Get all followers for a user - use req.params.id for user id
 router.get('/followers/:id', async function (req, res) {
@@ -19,7 +21,9 @@ router.post('/followers', async function (req, res) {
 
 // Updates the status of a follower item - use req.params.id for follower item id
 router.patch('/followers/:id', async function (req, res) {
-	
+	// UPDATE follows
+	// SET accepted = true
+	// WHERE follower_id = 1 ;
 	res.send({});
 });
 

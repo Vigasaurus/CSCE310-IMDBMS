@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const sql = require('../postgres');
+// Feature Set by Jesica Jimenez
 
 // // Returns the user object except the passwordhash
 // router.get('/users/:id', async function (req, res) {
