@@ -14,7 +14,7 @@ router.get('/likes', async function (req, res) {
 
 	// Likes query
 	const likes = await sql`
-		SELECT movie_id FROM likes where id = 2;
+		SELECT movie_id FROM likes where id = ${userid};
 	`;
 
 	res.send({likes});

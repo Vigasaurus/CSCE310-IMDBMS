@@ -4,6 +4,17 @@ const sql = require('../postgres');
 
 // Gets watchlist for a user - use req.params.user for user id
 router.get('/watchlist/:user', async function (req, res) {
+	const userid = 2;
+
+	// Featured list query
+	const featured_list = await sql`
+		SELECT movie_id FROM watches where id = ${userid};
+	`;
+
+	const example = await sql`
+		SELECT movie_id FROM watches where id = ${userid} INNER JOIN on movies where movies.id = movie_id;
+	`;
+	
 	res.send({});
 });
 

@@ -4,7 +4,14 @@ const sql = require('../postgres');
 
 // Gets current featured list - should check the date range using current datetime
 router.get('/featured', async function (req, res) {
-	res.send({});
+	const userid = 2;
+
+	// Featured list query
+	const featured_list = await sql`
+		SELECT movie_id FROM featured_movies where creator_id = ${userid};
+	`;
+	
+	res.send({featured_list});
 });
 
 // Adds new item to featured list - use req.body for new data (Vig will handle admin-only authorization)
