@@ -9,7 +9,7 @@ router.get('/featured', async function (req, res) {
 	const query = await sql`
 		SELECT * FROM featured_movies
 		WHERE ${today} 
-	`
+	`;
 
 	res.send({});
 });
@@ -18,8 +18,8 @@ router.get('/featured', async function (req, res) {
 router.post('/featured', async function (req, res) {
 	const query = await sql`
 		INSERT INTO featured_movies(week, movie_id, creator_id, index)
-		VALUES (${req.body}, ${req.body}, ${req.body}, 1)
-	`
+		VALUES (${req.body.week}, ${req.body.movieID}, ${req.body.creatorID}, 1)
+	`;
 	res.send({query});
 });
 
@@ -27,9 +27,9 @@ router.post('/featured', async function (req, res) {
 router.patch('/featured/:id', async function (req, res) {
 	const query = await sql`
 		UPDATE featured_movies
-		SET week = ${req.body}, movie_id = ${req.body}, creator_id = ${req.body}, index = ${req.body}
+		SET week = ${req.body.week}, movie_id = ${req.body.movieID}, creator_id = ${req.body.creatorID}, index = ${req.body.index}
 		WHERE id = ${req.params.id}
-	`
+	`;
 	res.send({query});
 });
 
@@ -37,7 +37,7 @@ router.patch('/featured/:id', async function (req, res) {
 router.delete('/featured/:id', async function (req, res) {
 	const query = await sql`
 		DELETE FROM featured_movies WHERE id = ${req.params.id}
-	`
+	`;
 	res.send({query});
 });
 
