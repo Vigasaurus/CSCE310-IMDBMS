@@ -1,4 +1,5 @@
 const express = require('express');
+const postgres = require('postgres');
 const router = express.Router();
 const sql = require('../postgres');
 
@@ -16,10 +17,11 @@ router.get('/featured', async function (req, res) {
 
 // Adds new item to featured list - use req.body for new data (Vig will handle admin-only authorization)
 router.post('/featured', async function (req, res) {
+	
 	const query = await sql`
-		INSERT INTO featured_movies(week, movie_id, creator_id, index)
-		VALUES (${req.body.week}, ${req.body.movieID}, ${req.body.creatorID}, 1)
-	`;
+	INSERT INTO featured_movies(week, movie_id, creator_id, index)
+	VALUES (${req.body.dateRange}::daterange, ${req.body.movieID}, ${req.body.creatorID}, ${req.body.index})
+`
 	res.send({query});
 });
 
