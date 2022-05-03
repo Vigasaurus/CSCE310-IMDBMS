@@ -1,41 +1,108 @@
 const express = require('express');
 const router = express.Router();
 const sql = require('../postgres');
+const { checkNotAuthenticated, checkAuthenticated } = require('../middleware');
+const passport = require('passport');
+const bcrypt = require('bcrypt');
 
-// Vignesh will handle
-router.post('/login', async function (req, res) {
-	res.send({});
+router.post(
+	'/login',
+	checkNotAuthenticated,
+	passport.authenticate('local', {
+		successRedirect: '/movies',
+		failureRedirect: '/login',
+	})
+);
+
+router.post('/signup', checkNotAuthenticated, async function (req, res) {
+	if (
+		[req.body.first_name, req.body.email, req.body.password].some(
+			(value) => !value
+		)
+	) {
+		res.status(400).send('Missing required fields.');
+		return;
+	}
+
+	const hashedPassword = await bcrypt.hash(
+		req.body.password,
+		parseInt(process.env.SALT)
+	);
+
+	try {
+		await sql`
+				INSERT INTO users (first_name, last_name, email, password_hash, isadmin) VALUES (${
+					req.body.first_name
+				}, ${req.body.last_name || ''}, ${req.body.email}, ${hashedPassword}, false);
+			`;
+		res.redirect('/login');
+	} catch (e) {
+		res.status(400).send(e);
+	}
+});
+
+router.get('/logout', checkAuthenticated, (req, res) => {
+	req.logOut();
+	res.redirect('/');
 });
 
 // Returns the user object except the passwordhash
 router.get('/users/:id', async function (req, res) {
-	// Example access URL-based parameters
-	console.log(req.params.id);
-
-	// Example access body-based parameters
-	console.log(req.body);
-
-	// Example query:
 	const users = await sql`
-		SELECT * FROM users where id = ${req.params.id};
+		SELECT first_name, last_name, email, isadmin FROM users where id = ${req.params.id};
 	`;
- 
-	res.send({ users });
-});
 
-// Adds a new user - uses req.body for data input
-router.post('/users', async function (req, res) {
-	res.send({});
+	if (users.length) res.send({ users: users[0] });
+	else res.status(404).send({ error: 'User not found' });
 });
 
 // Updates a user - uses req.body for data input and req.params.id for user id from url
-router.patch('/user/:id', async function (req, res) {
-	res.send({});
+router.patch('/users', checkAuthenticated, async function (req, res) {
+	let existing_user;
+	try {
+		existing_user = (
+			await sql`
+			SELECT * FROM users WHERE id = ${req.user.id};
+		`
+		)[0];
+	} catch (e) {
+		console.log(e);
+		res.status(500).send('An error occurred.');
+		return;
+	}
+
+	if (!existing_user) {
+		res.status(400).send('User does not exist.');
+	}
+
+	const hashedPassword = req.body.password
+		? await bcrypt.hash(req.body.password, parseInt(process.env.SALT))
+		: existing_user.password_hash;
+
+	try {
+		await sql`
+		UPDATE users SET first_name = ${
+			req.body.first_name || existing_user.first_name
+		}, last_name = ${req.body.last_name || existing_user.last_name}, email = ${req.body.email || existing_user.email}, password_hash = ${hashedPassword} WHERE users.id = ${req.user.id};
+	`;
+		res.send('Profile updated.');
+	} catch (e) {
+		console.log(e);
+		res.status(500).send('An error occurred.');
+	}
 });
 
 // Deletes a user - uses req.params.id for user id from url
-router.delete('/user/:id', async function (req, res) {
-	res.send({});
+router.delete('/user/:id', checkAuthenticated, async function (req, res) {
+	try {
+		await sql`
+		DELETE from users WHERE users.id = ${req.user.id};
+	`;
+		res.send('Profile updated.');
+	} catch (e) {
+		console.log(e);
+		res.status(500).send('An error occurred.');
+	}
 });
 
 module.exports = router;

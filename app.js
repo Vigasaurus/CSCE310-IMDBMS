@@ -4,9 +4,9 @@ const session = require('express-session');
 const app = express();
 const bodyParser = require('body-parser');
 const methodOverride = require('method-override');
-const bcrypt = require('bcrypt');
+const initPassport = require('./passport-config');
+const passport = require('passport');
 const sql = require('./postgres');
-const cookie = require('express-session/session/cookie');
 
 const baseRoutes = require('./routes');
 const userRoutes = require('./routes/users');
@@ -17,6 +17,8 @@ const likesRoutes = require('./routes/likes');
 const moderationRoutes = require('./routes/moderation');
 const reviewsRoutes = require('./routes/reviews');
 const watchlistRoutes = require('./routes/watchlist');
+
+initPassport(passport);
 
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('view engine', 'ejs');
@@ -29,6 +31,9 @@ app.use(
 		saveUninitialized: false,
 	})
 );
+
+app.use(passport.initialize());
+app.use(passport.session());
 
 app.use(baseRoutes);
 app.use('/api', userRoutes);

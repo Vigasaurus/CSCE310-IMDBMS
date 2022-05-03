@@ -1,21 +1,22 @@
 const express = require('express');
 const router = express.Router();
 const sql = require('../postgres');
+const middleware = require('../middleware');
 
 router.get('/', function (req, res) {
 	res.render('index');
 });
 
-router.get('/about-us', function (req, res) {
-	res.render('about-us');
+router.get('/movies', function (req, res) {
+	res.render('dashboard');
 });
 
-router.get('/terms-and-conditions', function (req, res) {
-	res.render('terms-and-conditions');
+router.get('/login', middleware.checkNotAuthenticated, function (req, res) {
+	res.render('login');
 });
 
-router.get('/privacy-policy', function (req, res) {
-	res.render('privacy-policy');
+router.get('/signup', middleware.checkNotAuthenticated, function (req, res) {
+	res.render('signup');
 });
 
 module.exports = router;

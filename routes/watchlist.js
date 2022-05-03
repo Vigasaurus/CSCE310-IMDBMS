@@ -1,49 +1,113 @@
 const express = require('express');
+const { checkAuthenticated } = require('../middleware');
 const router = express.Router();
 const sql = require('../postgres');
 
-// Gets watchlist for a user - use req.params.user for user id
-router.get('/watchlist/:user', async function (req, res) {
-	console.log(req.body);
-	const query = await sql`
-		SELECT * FROM watches where user_id = ${req.params.user}
-	`;
-	res.send({query});
-});
-
-// Adds new watchlist item for a user - use req.params.user for user id
-router.post('/watchlist/:user', async function (req, res) {
-	// title is key for body
-	const query = await sql`
-		INSERT INTO watches (user_id, movie_id, index)
-		VALUES (
-			${req.params.user}
-			, (select id from movies where title like '%${req.body.title}%' limit 1)
-			, 1
-		)
+// Gets watchlist for authenticated user
+router.get('/watchlist', checkAuthenticated, async function (req, res) {
+	const watchlist = await sql`
+		SELECT title, watches.index FROM movies
+		JOIN watches ON movies.id = watches.movie_id
+		WHERE watches.user_id  =${req.user.id};
 	`;
 
-	res.send({query});
+	res.send({ watchlist });
 });
+
+// Adds new watchlist item for authenticated user
+router.post(
+	'/watchlist/:movie_id',
+	checkAuthenticated,
+	async function (req, res) {
+		try {
+			const query = await sql`
+		INSERT INTO watches (user_id, movie_id, index) VALUES (${req.user.id}, ${req.params.movie_id}, 1)
+	`;
+
+			res.send('Watchlist item added.');
+		} catch (e) {
+			console.log(e);
+			res.status(500).send('An error occurred.');
+		}
+	}
+);
 
 // Updates a watchlist item for a user - use req.params.id for watchlist item id, use req.body for updated data
-router.patch('/watchlist/:id', async function (req, res) {
-	const query = await sql`
-		UPDATE watches
-		SET movie_id = (select id from movies where title like '%${req.body.title}%' limit 1), index = 1
-		WHERE id = ${req.params.id}
-	`;
+router.patch('/watchlist/:id', checkAuthenticated, async function (req, res) {
+	let existing_watchlist_item;
+	try {
+		existing_watchlist_item = (
+			await sql`
+			SELECT * FROM watches WHERE id = ${req.params.id};
+		`
+		)[0];
+	} catch (e) {
+		console.log(e);
+		res.status(500).send('An error occurred.');
+		return;
+	}
 
-	res.send({query});
+	if (!existing_watchlist_item) {
+		res.status(400).send('Watchlist item not found.');
+		return;
+	}
+
+	if (req.user.id !== existing_watchlist_item.user_id) {
+		res
+			.status(403)
+			.send('You do not have permission to update this watchlist item.');
+		return;
+	}
+
+	try {
+		await sql`
+			UPDATE watches
+			SET index = ${req.body.index || existing_like.index}
+			WHERE id = ${req.params.id};
+		`;
+		res.send('Watchlist item updated.');
+	} catch (e) {
+		console.log(e);
+		res.status(500).send('An error occurred.');
+	}
 });
 
-// Deletes a watchlist item for a user - use req.params.id for watchlist item id
-router.delete('/watchlist/:id', async function (req, res) {
-	const query = await sql`
-		DELETE FROM watches where id = ${req.params.id}
-	`;
+// Deletes a watchlist item for authenticated user - use req.params.id for watchlist item id
+router.delete('/watchlist/:id', checkAuthenticated, async function (req, res) {
+	let existing_watchlist_item;
+	try {
+		existing_watchlist_item = (
+			await sql`
+			SELECT * FROM watches WHERE id = ${req.params.id};
+		`
+		)[0];
+	} catch (e) {
+		console.log(e);
+		res.status(500).send('An error occurred.');
+		return;
+	}
 
-	res.send({query});
+	if (!existing_watchlist_item) {
+		res.status(400).send('Watchlist item not found.');
+		return;
+	}
+
+	if (req.user.id !== existing_watchlist_item.user_id) {
+		res
+			.status(403)
+			.send('You do not have permission to delete this watchlist item.');
+		return;
+	}
+
+	try {
+		await sql`
+		DELETE FROM watches WHERE id = ${req.params.id};
+	`;
+		res.send('Watchlist item deleted.');
+	} catch (e) {
+		console.log(e);
+		res.status(500).send('An error occurred.');
+	}
 });
 
 module.exports = router;
