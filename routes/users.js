@@ -19,7 +19,7 @@ router.get('/users/:id', async function (req, res) {
 	const users = await sql`
 		SELECT * FROM users where id = ${req.params.id};
 	`;
-
+ 
 	res.send({ users });
 });
 
