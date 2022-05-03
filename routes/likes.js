@@ -11,13 +11,13 @@ router.get('/likes', async function (req, res) {
 	console.log(req.body);
 
 	const likes = await sql`
-		SELECT title FROM movies 
+		SELECT title FROM movies
 		JOIN likes ON movies.id = likes.movie_id
 		WHERE likes.user_id  =${req.params.id};
 
 	`;
 	res.send({ likes });
-	// SELECT title FROM movies 
+	// SELECT title FROM movies
 	// JOIN likes ON movies.id = likes.movie_id
 	// WHERE likes.user_id =1 ;
 });
@@ -28,12 +28,11 @@ router.get('/likes/:id', async function (req, res) {
 	console.log(req.body);
 
 	const likes = await sql`
-		SELECT title FROM movies 
+		SELECT title FROM movies
 		JOIN likes ON movies.id = likes.movie_id
 		WHERE likes.id =${req.params.id};
-
 	`;
-// SELECT title FROM movies 
+// SELECT title FROM movies
 // JOIN likes ON movies.id = likes.movie_id
 // WHERE likes.id = 1;
 	res.send({likes});
@@ -41,7 +40,7 @@ router.get('/likes/:id', async function (req, res) {
 
 // Adds a like for the given user - uses req.params.user for the user id, and req.body for the movie id
 router.post('/likes/:user', async function (req, res) {
-	
+
 	// INSERT INTO likes(user_id, movie_id, index)
 	// VALUES ( 1, 2, 1) ;
 	console.log(req.params.id);
@@ -57,12 +56,12 @@ router.post('/likes/:user', async function (req, res) {
 
 // Updates a like given the like id - uses req.params.id for the like id, and req.body for updated index
 router.patch('/likes/:id', async function (req, res) {
-	
+
 // UPDATE likes
 // SET movies_id =4, index_num =1
 // WHERE  id = 3 ;
 
-	
+
 	console.log(req.params.id);
 	console.log(req.body);
 
@@ -72,7 +71,7 @@ router.patch('/likes/:id', async function (req, res) {
 		WHERE  id = ${req.params.id};
 
 	`;
-	
+
 	res.send({likes});
 });
 
