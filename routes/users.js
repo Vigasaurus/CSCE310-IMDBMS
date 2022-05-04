@@ -4,6 +4,7 @@ const sql = require('../postgres');
 const { checkNotAuthenticated, checkAuthenticated } = require('../middleware');
 const passport = require('passport');
 const bcrypt = require('bcrypt');
+// Feature Set by Vignesh Joglekar
 
 router.post(
 	'/login',

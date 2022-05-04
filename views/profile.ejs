@@ -59,10 +59,7 @@
 			const user_id = parseInt(document.getElementById('auth').innerText);
 
 			fetch('/api/followers').then(res => res.json()).then(data => {
-				console.log(data)
 				const followers = data.follows.filter(follower => follower.followed_id === profile_id)
-
-				console.log(followers)
 
 				if (followers.length) {
 					document.querySelector('#follow-form button').textContent = 'Unfollow User';
@@ -77,9 +74,8 @@
 
 			if (profile_id === user_id) {
 				fetch('/api/followers/requests').then(res => res.json()).then(data => {
-					console.log(data)
 					const activeRequests = data.follow_requests.filter(request => !request.accepted);
-					console.log(activeRequests)
+
 					if (activeRequests.length) {
 						document.querySelector('#follow-request').classList.remove('hidden');
 						document.querySelector('#follow-request #request-name').textContent = activeRequests[0].first_name + ' ' + activeRequests[0].last_name;

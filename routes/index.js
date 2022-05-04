@@ -6,6 +6,7 @@ const {
 	checkAuthenticated,
 	checkAdmin,
 } = require('../middleware');
+// Feature Set by Vignesh Joglekar
 
 router.get('/', checkNotAuthenticated, function (req, res) {
 	res.render('landing');

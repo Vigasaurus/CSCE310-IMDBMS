@@ -2,6 +2,7 @@ const express = require('express');
 const { checkAuthenticated } = require('../middleware');
 const router = express.Router();
 const sql = require('../postgres');
+// Feature Set by Aaryan Shenoy
 
 // Returns all movies in the database, not including the casting information
 router.get('/movies', async function (req, res) {
@@ -45,7 +46,8 @@ router.post('/movies', checkAuthenticated, async function (req, res) {
 		await sql`
 		INSERT INTO movies (title, genre, runtime) VALUES (${req.body.title}, ${req.body.genre}, ${req.body.runtime});
 	`;
-		res.send('Movie added.');
+		req.flash('success', 'Movie added.');
+		res.redirect(`/moderation`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');
@@ -165,7 +167,8 @@ router.delete('/movies/:id', checkAuthenticated, async function (req, res) {
 		await sql`
 		DELETE FROM movies WHERE id = ${req.params.id}
 	`;
-		res.send('Movie deleted.');
+		req.flash('success', 'Movie deleted.');
+		res.redirect(`/dashboard`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');

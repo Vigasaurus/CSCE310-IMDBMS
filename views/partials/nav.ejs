@@ -48,6 +48,9 @@
 
 		<% if (hideAuth && auth) { %>
 		<div class="items-center flex-shrink-0 hidden lg:flex">
+			<% if (auth.isadmin) { %>
+				<a class="self-center px-8 py-3 rounded bg-gray-100 mr-4" href="/moderation">Moderation</a>
+			<% } %>
 			<a class="self-center px-8 py-3 mr-4" href="/profile/<%= auth.id %>"><%= auth.first_name %> <%= auth.last_name %></a>
 			<a class="self-center px-6 py-3 font-semibold rounded bg-violet-400 text-coolGray-900" href="/api/logout">Logout</a>
 		</div>
@@ -66,7 +69,7 @@
 			if (flash) {
 				setTimeout(() => {
 					flash.classList.add('opacity-0');
-				}, 1200);
+				}, 1750);
 			}
 		});
 	</script>

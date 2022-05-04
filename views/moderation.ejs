@@ -5,14 +5,169 @@
 	<body>
 		<%- include('partials/nav', {hideAuth: true, auth, messages}) %>
 
-		<div id="content" class="container mx-auto" style="min-height: calc(100vh - 14rem);">
-			<div class="flex flex-col justify-center items-center">
-				<h2 class="">IMDBMS</h2>
+		<section class="dark:bg-coolGray-800 dark:text-coolGray-100 flex justify-around">
+			<div class="container max-w-md px-4 py-12">
+				<div class="grid gap-4 mx-4 sm:grid-cols-12">
+					<div class="col-span-12 sm:col-span-6">
+						<div class="text-center sm:text-left mb-14 before:block before:w-24 before:h-3 before:mb-5 before:rounded-md before:mx-auto sm:before:mx-0 before:dark:bg-violet-400">
+							<h3 class="text-3xl font-semibold">Moderation Log</h3>
+							<span class="text-sm font-semibold tracking-wider uppercase dark:text-coolGray-400">A log of past moderation actions by all admins</span>
+						</div>
+					</div>
+					<div class="relative col-span-8 px-4 space-y-6 sm:col-span-9">
+						<div class="col-span-6 space-y-6 relative px-4 sm:before:absolute sm:before:top-2 sm:before:bottom-0 sm:before:w-0.5 sm:before:-left-3 before:dark:bg-coolGray-700" id="modlog">
+						</div>
+					</div>
+				</div>
 			</div>
-		</div>
+			<div class="container max-w-4xl px-4 py-12">
+				<div class="container p-2 mx-auto sm:p-4 dark:text-coolGray-100">
+					<h2 class="mb-4 text-2xl font-semibold leading-tight">Featured Movies</h2>
+					<div class="overflow-x-auto">
+						<table class="min-w-full text-xs">
+							<colgroup>
+								<col>
+								<col>
+								<col>
+								<col>
+								<col>
+								<col class="w-24">
+							</colgroup>
+							<thead class="dark:bg-coolGray-700">
+								<tr class="text-left">
+									<th class="p-3">Index</th>
+									<th class="p-3">Title</th>
+									<th class="p-3">Creator</th>
+									<th class="p-3">Re-position</th>
+									<th class="p-3">Delete?</th>
+								</tr>
+							</thead>
+							<tbody id="featured-table">
+							</tbody>
+						</table>
+					</div>
 
-		<script src="/scripts/index.js"></script>
+					<form novalidate="" class="w-1/2 mt-4 flex flex-col py-6 space-y-6 md:py-0 md:px-6 ng-untouched ng-pristine ng-valid" method="POST" action="/api/featured">
+						<h2 class="text-3xl font-bold">Add a featured movie</h2>
+						<label class="block">
+							<span class="mb-1">Movie ID</span>
+							<input name="movie_id" type="text" placeholder="38" class="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-violet-400 dark:bg-coolGray-800">
+						</label>
+							<button type="submit" id="review-submit" class="self-center px-6 py-2 text-md rounded focus:ring hover:ring focus:ring-opacity-75 dark:bg-violet-400 dark:text-coolGray-900 focus:ring-violet-400 hover:ring-violet-400">Feature Movie</button>
+					</form>
+
+					<hr class="my-8 mx-4" >
+
+					<form novalidate="" class="w-1/2 flex flex-col py-6 space-y-6 md:py-0 md:px-6 ng-untouched ng-pristine ng-valid" method="POST" action="/api/movies">
+						<h2 class="text-3xl font-bold">Add a new movie entry</h2>
+						<label class="block">
+							<span class="mb-1">Title</span>
+							<input name="title" type="text" placeholder="Star Wars" class="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-violet-400 dark:bg-coolGray-800">
+						</label>
+						<label class="block">
+							<span class="mb-1">Genre</span>
+							<input name="genre" type="text" placeholder="Comedy" class="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-violet-400 dark:bg-coolGray-800">
+						</label>
+						<label class="block">
+							<span class="mb-1">Runtime</span>
+							<input name="runtime" type="text" placeholder="138" class="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-violet-400 dark:bg-coolGray-800">
+						</label>
+						<button type="submit" id="review-submit" class="self-center px-6 py-2 text-md rounded focus:ring hover:ring focus:ring-opacity-75 dark:bg-violet-400 dark:text-coolGray-900 focus:ring-violet-400 hover:ring-violet-400">Add Movie</button>
+					</form>
+				</div>
+			</div>
+		</section>
+
 		<%- include('partials/footer') %>
 	</body>
 
+	<script>
+		window.addEventListener('load', () => {
+			fetch('/api/modaction').then(response => response.json()).then(data => {
+				data.modlog.forEach(modlog => {
+					const div = document.createElement('div');
+					div.className = 'flex flex-col sm:relative sm:before:absolute sm:before:top-2 sm:before:w-4 sm:before:h-4 sm:before:rounded-full before:dark:bg-violet-400';
+
+					const h3 = document.createElement('h3');
+					h3.className = 'ml-6 text-xl font-semibold tracking-wide';
+					h3.textContent = modlog.type;
+
+					const author = document.createElement('p');
+					author.className = 'mt-2 text-xs tracking-wide uppercase dark:text-coolGray-400';
+					author.textContent = modlog.first_name + ' ' + modlog.last_name;
+
+					const p = document.createElement('p');
+					p.className = 'mt-3';
+					p.textContent = `ID: ${modlog.review_id || modlog.user_id || modlog.movie_id}`;
+
+					div.appendChild(h3);
+					div.appendChild(author);
+					div.appendChild(p);
+
+					document.getElementById('modlog').appendChild(div);
+				});
+			});
+
+			fetch('/api/featured').then(response => response.json()).then(data => {
+				const minIndex = Math.min(...data.featured_movies.map(item => item.index));
+
+				data.featured_movies.forEach(featured => {
+					const tr = document.createElement('tr');
+					tr.className = 'border-b border-opacity-20 dark:border-coolGray-700 dark:bg-coolGray-900';
+
+					const td = document.createElement('td');
+					td.className = 'p-3';
+					td.textContent = featured.index;
+
+					const td2 = document.createElement('td');
+					td2.className = 'p-3';
+					td2.textContent = featured.title;
+
+					const td3 = document.createElement('td');
+					td3.className = 'p-3';
+					td3.textContent = featured.first_name + ' ' + featured.last_name;
+
+					const td4 = document.createElement('td');
+					td4.className = 'p-3';
+
+					const span = document.createElement('span');
+					span.className = 'px-3 py-1 font-semibold rounded-md dark:bg-violet-400 dark:text-coolGray-900 cursor-pointer';
+					span.textContent = 'Move to top';
+
+					td4.appendChild(span);
+
+					const span2 = document.createElement('span');
+					span2.className = 'px-3 py-1 font-semibold rounded-md dark:bg-violet-400 dark:text-coolGray-900 cursor-pointer';
+					span2.textContent = 'Delete';
+
+					const td5 = document.createElement('td');
+					td5.className = 'p-3';
+					td5.appendChild(span2);
+
+					tr.appendChild(td);
+					tr.appendChild(td2);
+					tr.appendChild(td3);
+					tr.appendChild(td4);
+					tr.appendChild(td5);
+
+					span.addEventListener('click', () => {
+						fetch('/api/featured/' + featured.id, {
+							method: 'PATCH',
+							body: new URLSearchParams({
+								index: minIndex-1
+							})
+						});
+					});
+
+					span2.addEventListener('click', () => {
+						fetch('/api/featured/' + featured.id, {
+							method: 'DELETE'
+						});
+					});
+
+					document.getElementById('featured-table').appendChild(tr);
+				});
+			});
+		});
+	</script>
 </html>

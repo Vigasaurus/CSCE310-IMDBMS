@@ -2,14 +2,15 @@ const express = require('express');
 const { checkAuthenticated } = require('../middleware');
 const router = express.Router();
 const sql = require('../postgres');
+// Feature Set by David Tang
 
 // Gets watchlist for authenticated user
 router.get('/watchlist', checkAuthenticated, async function (req, res) {
 	const watchlist = await sql`
-		SELECT title, watches.index, watches.id as watch_id, movies.id FROM movies
+		SELECT title, watches.index, watches.id as watch_id, movies.id, genre FROM movies
 		JOIN watches ON movies.id = watches.movie_id
 		WHERE watches.user_id  =${req.user.id}
-		ORDER BY watches.index;
+		ORDER BY watches.index ASC;
 	`;
 
 	res.send({ watchlist });

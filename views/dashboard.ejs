@@ -61,6 +61,7 @@
 					<div class="mb-8 space-x-5 border-b-2 border-opacity-10 dark:border-violet-400">
 						<button type="button" class="pb-5 text-xs font-bold uppercase border-b-2 border-violet-400" id="watchlist">Watchlist</button>
 						<button type="button" class="pb-5 text-xs font-bold uppercase border-b-2 border-transparent" id="following">Following</button>
+						<button type="button" class="pb-5 text-xs font-bold uppercase border-b-2 border-transparent" id="likes">Likes</button>
 					</div>
 					<div class="flex flex-col divide-y divide-coolGray-700 transition" id="watchlist-content">
 						<div class="flex px-1 py-8 hidden" id="empty-watchlist">
@@ -110,7 +111,7 @@
 						<div class="flex px-1 py-4 follow-inner-content">
 							<div class="flex flex-col flex-grow">
 								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline follow-title">Aenean ac tristique lorem, ut mollis dui.</a>
-								<p class="mt-auto text-xs dark:text-coolGray-400">5 minutes ago
+								<p class="mt-auto text-xs dark:text-coolGray-400">
 									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline follow-status-input">Politics</span>
 								</p>
 							</div>
@@ -140,6 +141,45 @@
 							</div>
 						</div><!---->
 					</div>
+					<div class="flex flex-col divide-y divide-coolGray-700 transition hidden" id="likes-content">
+						<div class="flex px-1 py-8 hidden" id="empty-likes">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="" class="font-serif hover:underline">Your haven't liked any movies yet!</a>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 likes-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline likes-movie-title">Aenean ac tristique lorem, ut mollis dui.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline likes-genre-input">Politics</span>
+								</p>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 likes-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline likes-movie-title">Nulla consectetur efficitur.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline likes-genre-input">Sports</span>
+								</p>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 likes-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline likes-movie-title">Vitae semper augue purus tincidunt libero.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline likes-genre-input">World</span>
+								</p>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 likes-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline likes-movie-title">Suspendisse potenti.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline likes-genre-input">Business</span>
+								</p>
+							</div>
+						</div><!---->
+					</div>
 				</div>
 			</div>
 		</section>
@@ -155,7 +195,7 @@
 				});
 				document.querySelectorAll('.featured-movie-title').forEach((title, index) => {
 					title.textContent = data.featured_movies[index].title;
-					title.href = `/movie/${data.featured_movies[index].id}`;
+					title.href = `/movie/${data.featured_movies[index].movie_id}`;
 				});
 				document.querySelector('.minutes-diff').textContent = Math.floor(Math.random()*35 + 24);
 				document.querySelectorAll('.hours-diff').forEach(diff => {
@@ -166,7 +206,6 @@
 			});
 
 			fetch('/api/watchlist').then(response => response.json()).then(data => {
-				console.log(data);
 				if (data.watchlist.length === 0) {
 					document.querySelectorAll('.watchlist-inner-content').forEach(content => {
 						content.classList.add('hidden');
@@ -190,8 +229,31 @@
 				});
 			});
 
+			fetch('/api/likes').then(response => response.json()).then(data => {
+				if (data.likes.length === 0) {
+					document.querySelectorAll('.likes-inner-content').forEach(content => {
+						content.classList.add('hidden');
+					});
+					document.getElementById('empty-likes').classList.remove('hidden');
+					return;
+				}
+
+				document.querySelectorAll('.likes-inner-content').forEach((content, index) => {
+					if (index >= data.likes.length) {
+						content.classList.add('hidden');
+					}
+				});
+
+				[...document.querySelectorAll('.likes-genre-input')].slice(0,data.likes.length).forEach((genre, index) => {
+					genre.textContent = data.likes[index].genre;
+				});
+				[...document.querySelectorAll('.likes-movie-title')].slice(0,data.likes.length).forEach((title, index) => {
+					title.textContent = data.likes[index].title;
+					title.href = `/movie/${data.likes[index].id}`;
+				});
+			});
+
 			fetch('/api/followers').then(response => response.json()).then(data => {
-				console.log(data)
 				if (data.follows.length === 0) {
 					document.querySelectorAll('.follow-inner-content').forEach(content => {
 						content.classList.add('hidden');
@@ -210,8 +272,8 @@
 					status.textContent = data.follows[index].accepted ? 'Accepted' : 'Unaccepted';
 				});
 				[...document.querySelectorAll('.follow-title')].slice(0,data.follows.length).forEach((title, index) => {
-					title.textContent = data.follows[index].title || "";
-					title.href = data.follows[index] ? `/movie/${data.follows[index].id}` : "";
+					title.textContent = data.follows[index].first_name + ' ' + data.follows[index].last_name || "";
+					title.href = data.follows[index] ? `/profile/${data.follows[index].followed_id}` : "";
 				});
 			});
 
@@ -222,8 +284,12 @@
 				document.getElementById('following').classList.remove('border-violet-400');
 				document.getElementById('following').classList.add('border-transparent');
 
+				document.getElementById('likes').classList.remove('border-violet-400');
+				document.getElementById('likes').classList.add('border-transparent');
+
 				document.getElementById('watchlist-content').classList.remove('hidden');
 				document.getElementById('following-content').classList.add('hidden');
+				document.getElementById('likes-content').classList.add('hidden');
 			});
 
 			document.getElementById('following').addEventListener('click', () => {
@@ -233,8 +299,27 @@
 				document.getElementById('watchlist').classList.remove('border-violet-400');
 				document.getElementById('watchlist').classList.add('border-transparent');
 
-				document.getElementById('watchlist-content').classList.add('hidden');
+				document.getElementById('likes').classList.remove('border-violet-400');
+				document.getElementById('likes').classList.add('border-transparent');
+
 				document.getElementById('following-content').classList.remove('hidden');
+				document.getElementById('watchlist-content').classList.add('hidden');
+				document.getElementById('likes-content').classList.add('hidden');
+			});
+
+			document.getElementById('likes').addEventListener('click', () => {
+				document.getElementById('likes').classList.add('border-violet-400');
+				document.getElementById('likes').classList.remove('border-transparent');
+
+				document.getElementById('following').classList.add('border-transparent');
+				document.getElementById('following').classList.remove('border-violet-400');
+
+				document.getElementById('watchlist').classList.add('border-transparent');
+				document.getElementById('watchlist').classList.remove('border-violet-400');
+
+				document.getElementById('following-content').classList.add('hidden');
+				document.getElementById('watchlist-content').classList.add('hidden');
+				document.getElementById('likes-content').classList.remove('hidden');
 			});
 		});
 	</script>

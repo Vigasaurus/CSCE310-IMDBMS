@@ -20,6 +20,7 @@
 						<div class="flex flex-col" action="">
 							<button class="w-full px-8 py-3 mb-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900 hidden" id="watchlist-highlight-button">Move to top of Watchlist</button>
 							<button class="w-full px-8 py-3 rounded-md dark:bg-violet-400 dark:text-coolGray-900 hidden" id="like-highlight-button">Move to top of Liked List</button>
+							<button type="submit" class="w-full px-8 py-3 rounded-md dark:bg-red-300 dark:text-coolGray-900 hidden" id="admin-delete-button">Delete Movie</button>
 						</div>
 					</div>
 					<div class="p-6 xl:col-span-3">
@@ -34,6 +35,10 @@
 											<a class="text-sm dark:text-coolGray-400 review-author"></a>
 										</div>
 									</div>
+									<div class="hidden admin-actions">
+										<button class="w-2/5 mt-4 px-4 py-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900 review-clear">Clear Body</button>
+										<button class="w-2/5 mt-4 ml-4 px-4 py-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900 review-delete">Delete Review</button>
+									</div>
 								</div>
 								<div class="p-6 rounded shadow-md dark:bg-coolGray-900 review-wrapper">
 									<p class="review-body"></p>
@@ -43,6 +48,10 @@
 											<p class="text-lg font-semibold review-title"></p>
 											<a class="text-sm dark:text-coolGray-400 review-author"></a>
 										</div>
+									</div>
+									<div class="hidden admin-actions">
+										<button class="w-2/5 mt-4 px-4 py-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900 review-clear">Clear Body</button>
+										<button class="w-2/5 mt-4 ml-4 px-4 py-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900 review-delete">Delete Review</button>
 									</div>
 								</div>
 							</div>
@@ -56,6 +65,10 @@
 											<a class="text-sm dark:text-coolGray-400 review-author"></a>
 										</div>
 									</div>
+									<div class="hidden admin-actions">
+										<button class="w-2/5 mt-4 px-4 py-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900 review-clear">Clear Body</button>
+										<button class="w-2/5 mt-4 ml-4 px-4 py-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900 review-delete">Delete Review</button>
+									</div>
 								</div>
 								<div class="p-6 rounded shadow-md dark:bg-coolGray-900 review-wrapper">
 									<p class="review-body"></p>
@@ -65,6 +78,10 @@
 											<p class="text-lg font-semibold review-title"></p>
 											<a class="text-sm dark:text-coolGray-400 review-author"></a>
 										</div>
+									</div>
+									<div class="hidden admin-actions">
+										<button class="w-2/5 mt-4 px-4 py-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900 review-clear">Clear Body</button>
+										<button class="w-2/5 mt-4 ml-4 px-4 py-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900 review-delete">Delete Review</button>
 									</div>
 								</div>
 								<div class="p-6 rounded shadow-md dark:bg-coolGray-900 empty-reviews hidden">
@@ -103,16 +120,18 @@
 
 		<%- include('partials/footer') %>
 		<p id="auth" class="hidden"><%= auth.id %></p>
+		<p id="isadmin" class="hidden"><%= auth.isadmin %></p>
 	</body>
 
 	<script>
 		window.addEventListener('load', () => {
 			const movie_id = parseInt(window.location.href.split('/')[4]);
 			const user_id = parseInt(document.getElementById('auth').innerText);
+			const user_is_admin = JSON.parse(document.getElementById('isadmin').innerText);
+
 			fetch(`/api/movies/${movie_id}`).then(response => response.json()).then(data => {
 				document.querySelector('#movie-title').textContent = data.movie.title;
 				document.querySelector('#movie-genre').textContent = data.movie.genre;
-
 			});
 
 			fetch(`/api/reviews/${movie_id}`).then(response => response.json()).then(data => {
@@ -123,6 +142,12 @@
 					});
 					return;
 				}
+
+				document.querySelectorAll('.review-wrapper').forEach((content, index) => {
+					if (index >= data.reviews.length) {
+						content.classList.add('hidden');
+					}
+				});
 
 				const myReview = data.reviews.filter(item => item.author_id == user_id)[0]
 
@@ -149,16 +174,29 @@
 					document.getElementById('add-review').action = `/api/reviews/${movie_id}`;
 				}
 
-				document.querySelectorAll('.review-body').forEach((body, index) => {
+				[...document.querySelectorAll('.review-body')].slice(0,data.reviews.length).forEach((body, index) => {
 					body.textContent = data.reviews[index].body;
 				});
-				document.querySelectorAll('.review-title').forEach((title, index) => {
+				[...document.querySelectorAll('.review-title')].slice(0,data.reviews.length).forEach((title, index) => {
 					title.textContent = data.reviews[index].title;
 				});
-				document.querySelectorAll('.review-author').forEach((author, index) => {
+				[...document.querySelectorAll('.review-author')].slice(0,data.reviews.length).forEach((author, index) => {
 					author.textContent = data.reviews[index].first_name + ' ' + data.reviews[index].last_name;
 					author.href = `/profile/${data.reviews[index].author_id}`;
 				});
+
+				if (user_is_admin) {
+					[...document.querySelectorAll('.review-wrapper .admin-actions')].slice(0,data.reviews.length).forEach((review, index) => {
+						review.classList.remove('hidden');
+						review.children[0].addEventListener('click', () => {
+							fetch(`/api/modaction/${data.reviews[index].id}`, {method: 'PATCH'});
+						});
+
+						review.children[1].addEventListener('click', () => {
+							fetch(`/api/modaction/review/${data.reviews[index].id}`, {method: 'DELETE'});
+						});
+					});
+				}
 			});
 
 
@@ -214,6 +252,18 @@
 				}
 			});
 
+			if (user_is_admin) {
+				document.getElementById('admin-delete-button').classList.remove('hidden');
+
+				document.getElementById('admin-delete-button').addEventListener('click', () => {
+					fetch(`/api/movies/${movie_id}`, {method: 'DELETE'});
+
+					setTimeout(() => {
+						window.location.pathname = '/dashboard';
+						window.reload();
+					}, 750);
+				});
+			}
 		});
 
 	</script>

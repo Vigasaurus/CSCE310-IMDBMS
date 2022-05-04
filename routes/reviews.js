@@ -2,11 +2,12 @@ const express = require('express');
 const router = express.Router();
 const sql = require('../postgres');
 const { checkAuthenticated } = require('../middleware');
+// Feature Set by Aaryan Shenoy
 
 // Retrieves all reviews for a movie - uses req.params.movie_id for movie id
 router.get('/reviews/:movie_id', async function (req, res) {
 	const reviews = await sql`
-		SELECT reviews.title, reviews.body, users.first_name, users.last_name, reviews.body, reviews.positive_sentiment, author_id, reviews.id FROM reviews INNER JOIN users ON reviews.author_id = users.id WHERE reviews.movie_id = ${req.params.movie_id};
+		SELECT reviews.title, reviews.body, users.first_name, users.last_name, reviews.body, reviews.positive_sentiment, author_id, reviews.id FROM reviews INNER JOIN users ON reviews.author_id = users.id WHERE reviews.movie_id = ${req.params.movie_id} ORDER BY reviews.id ASC;
 	`;
 
 	res.send({ reviews });

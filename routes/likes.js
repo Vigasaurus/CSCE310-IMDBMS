@@ -7,9 +7,10 @@ const { checkAuthenticated } = require('../middleware');
 // Returns all likes for currently logged in user
 router.get('/likes', checkAuthenticated, async function (req, res) {
 	const likes = await sql`
-		SELECT title, likes.index, likes.id as like_id, movies.id as id FROM movies
+		SELECT title, likes.index, likes.id as like_id, movies.id as id, movies.genre FROM movies
 		JOIN likes ON movies.id = likes.movie_id
-		WHERE likes.user_id  =${req.user.id};
+		WHERE likes.user_id  =${req.user.id}
+		ORDER BY likes.index ASC;
 	`;
 
 	res.send({ likes });

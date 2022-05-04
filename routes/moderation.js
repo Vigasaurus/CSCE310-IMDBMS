@@ -2,6 +2,7 @@ const express = require('express');
 const { checkAuthenticated } = require('../middleware');
 const router = express.Router();
 const sql = require('../postgres');
+// Feature Set by Vignesh Joglekar
 
 // Retrieves most recent x modlog items
 router.get('/modaction', checkAuthenticated, async function (req, res) {
@@ -11,9 +12,9 @@ router.get('/modaction', checkAuthenticated, async function (req, res) {
 	}
 
 	const modlog = await sql`
-		SELECT * FROM admin_actions;
+		SELECT review_id, user_id, movie_id, type, admin_id, first_name, last_name FROM admin_actions INNER JOIN users ON admin_actions.admin_id = users.id;
 	`;
-	res.send({ modlog });
+	res.json({ modlog });
 });
 
 // Updates a review body - use req.params.id for review id
@@ -40,7 +41,9 @@ router.patch('/modaction/:id', checkAuthenticated, async function (req, res) {
 		await sql`
 			INSERT INTO admin_actions(type, review_id, admin_id) VALUES ('review_clear', ${req.params.id}, ${req.user.id});
 		`;
-		res.send('Review cleared!');
+
+		req.flash('success', 'Review cleared.');
+		res.redirect(`/movie/${existing_review[0].movie_id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');
@@ -100,7 +103,12 @@ router.delete(
 		`;
 			}
 
-			res.send(`Entry of type '${req.params.type}' deleted.`);
+			req.flash(`Entry of type '${req.params.type}' deleted.`);
+			if (req.params.type === 'user') {
+				res.redirect(`/profile/${existing_entry[0].id}`);
+			} else if (req.params.type === 'review') {
+				res.redirect(`/movie/${existing_entry[0].movie_id}`);
+			}
 		} catch (e) {
 			console.log(e);
 			res.status(500).send('An error occurred.');
