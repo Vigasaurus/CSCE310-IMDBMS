@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/header') %>
+
+	<body>
+		<%- include('partials/nav', {hideAuth: true, auth, messages}) %>
+
+		<section class="dark:bg-coolGray-800 dark:text-coolGray-100 opacity-0" id="content">
+			<div class="container px-6 py-12 mx-auto">
+				<div class="grid items-center gap-4 xl:grid-cols-5">
+					<div class="max-w-2xl mx-auto my-8 space-y-4 text-center xl:col-span-2 xl:text-left">
+						<h2 class="text-4xl font-bold" id="user-name"></h2>
+						<p class="dark:text-coolGray-400" id="user-email"></p>
+						<form method="post" id="follow-form" action="">
+							<button type="submit" class="w-full px-8 py-3 rounded-md dark:bg-violet-400 dark:text-coolGray-900" id="form-button">Follow User</button>
+						</form>
+						<div class="flex flex-col hidden" action="" id="follow-request">
+							<span>Pending follow request from <span class="text-violet-400 underline mb-4"><a id="request-name"></a></span> - accept?</span>
+							<button class="w-full px-8 py-3 mb-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900" id="request-accept">Accept</button>
+							<button class="w-full px-8 py-3 mb-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900" id="request-reject">Reject</button>
+						</div>
+					</div>
+					<div class="p-6 xl:col-span-3">
+						<form novalidate="" class="w-1/2 flex flex-col py-6 space-y-6 md:py-0 md:px-6 ng-untouched ng-pristine ng-valid hidden" id="edit-info" method="" action="javascript:void(0);">
+							<h2 class="text-4xl font-bold">Edit your info!</h2>
+							<label class="block">
+								<span class="mb-1">First Name</span>
+								<input name="first" type="text" placeholder="" class="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-violet-400 dark:bg-coolGray-800">
+							</label>
+							<label class="block">
+								<span class="mb-1">Last Name</span>
+								<input name="last" type="text" placeholder="" class="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-violet-400 dark:bg-coolGray-800">
+							</label>
+							<label class="block">
+								<span class="mb-1">Email</span>
+								<input name="email" type="text" placeholder="" class="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-violet-400 dark:bg-coolGray-800">
+							</label>
+							<label class="block">
+								<span class="mb-1">New Password</span>
+								<input name="password" type="password" placeholder="*****" class="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-violet-400 dark:bg-coolGray-800">
+							</label>
+							<div>
+								<button type="submit" id="user-submit" class="self-center px-8 py-3 text-lg rounded focus:ring hover:ring focus:ring-opacity-75 dark:bg-violet-400 dark:text-coolGray-900 focus:ring-violet-400 hover:ring-violet-400">Submit</button>
+								<button id="user-delete" class="self-center px-8 py-3 text-lg rounded focus:ring hover:ring focus:ring-opacity-75 dark:bg-violet-400 dark:text-coolGray-900 focus:ring-violet-400 hover:ring-violet-400">Delete Account</button>
+							</div>
+						</form>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<%- include('partials/footer') %>
+		<p id="auth" class="hidden"><%= auth.id %></p>
+	</body>
+
+	<script>
+		window.addEventListener('load', () => {
+			const profile_id = parseInt(window.location.href.split('/')[4]);
+			const user_id = parseInt(document.getElementById('auth').innerText);
+
+			fetch('/api/followers').then(res => res.json()).then(data => {
+				console.log(data)
+				const followers = data.follows.filter(follower => follower.followed_id === profile_id)
+
+				console.log(followers)
+
+				if (followers.length) {
+					document.querySelector('#follow-form button').textContent = 'Unfollow User';
+					document.querySelector('#follow-form').action = 'javascript:void(0);';
+					document.querySelector('#follow-form button').addEventListener('click', () => {
+						fetch(`/api/followers/${followers[0].id}`, {method: 'DELETE'});
+					});
+				} else {
+					document.querySelector('#follow-form').action = '/api/followers/' + profile_id;
+				}
+			});
+
+			if (profile_id === user_id) {
+				fetch('/api/followers/requests').then(res => res.json()).then(data => {
+					console.log(data)
+					const activeRequests = data.follow_requests.filter(request => !request.accepted);
+					console.log(activeRequests)
+					if (activeRequests.length) {
+						document.querySelector('#follow-request').classList.remove('hidden');
+						document.querySelector('#follow-request #request-name').textContent = activeRequests[0].first_name + ' ' + activeRequests[0].last_name;
+						document.querySelector('#follow-request #request-name').href = `/profile/${activeRequests[0].follower_id}`;
+						document.querySelector('#follow-request #request-accept').addEventListener('click', () => {
+							fetch(`/api/followers/${activeRequests[0].id}`, {method: 'PATCH'});
+						});
+
+						document.querySelector('#follow-request #request-reject').addEventListener('click', () => {
+							fetch(`/api/followers/${activeRequests[0].id}`, {method: 'DELETE'});
+						});
+					}
+				});
+			}
+
+			fetch(`/api/users/${profile_id}`).then(res => res.json()).then(data => {
+				const user = data.users;
+
+				document.getElementById('user-name').innerText = user.first_name + ' ' + user.last_name;
+				document.getElementById('user-email').innerText = user.email;
+
+				if (user_id === user.id) {
+					document.getElementById('follow-form').classList.add('hidden');
+					document.getElementById('edit-info').classList.remove('hidden');
+					document.querySelector('#edit-info input[name="first"]').value = user.first_name;
+					document.querySelector('#edit-info input[name="last"]').value = user.last_name;
+					document.querySelector('#edit-info input[name="email"]').value = user.email;
+					document.querySelector('#edit-info input[name="password"]').value = "";
+
+					document.getElementById('user-submit').addEventListener('click', () => {
+						const urlencoded = new URLSearchParams();
+						urlencoded.append('first_name', document.querySelector('#edit-info input[name="first"]').value);
+						urlencoded.append('last_name', document.querySelector('#edit-info input[name="last"]').value);
+						urlencoded.append('email', document.querySelector('#edit-info input[name="email"]').value);
+						urlencoded.append('password', document.querySelector('#edit-info input[name="password"]').value);
+
+						fetch(`/api/users`, {method: 'PATCH', body: urlencoded});
+					});
+
+					document.getElementById('user-delete').addEventListener('click', () => {
+						if (confirm('Are you sure you want to delete your account?')) {
+							fetch(`/api/users`, {method: 'DELETE'});
+						}
+					});
+				}
+
+				document.querySelector('#content').classList.remove('opacity-0');
+			});
+
+
+		});
+
+	</script>
+
+
+</html>

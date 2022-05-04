@@ -6,14 +6,14 @@ const { checkAuthenticated } = require('../middleware');
 // Retrieves all reviews for a movie - uses req.params.movie_id for movie id
 router.get('/reviews/:movie_id', async function (req, res) {
 	const reviews = await sql`
-		SELECT reviews.title, reviews.body, users.first_name, users.last_name, reviews.body, reviews.positive_sentiment FROM reviews INNER JOIN users ON reviews.author_id = users.id WHERE reviews.movie_id = ${req.params.movie_id};
+		SELECT reviews.title, reviews.body, users.first_name, users.last_name, reviews.body, reviews.positive_sentiment, author_id, reviews.id FROM reviews INNER JOIN users ON reviews.author_id = users.id WHERE reviews.movie_id = ${req.params.movie_id};
 	`;
 
 	res.send({ reviews });
 });
 
 // Retrieves all reviews for an author - uses req.params.author_id for author id
-router.get('/reviews/:author_id', async function (req, res) {
+router.get('/reviews/user/:author_id', async function (req, res) {
 	const reviews = await sql`
 		SELECT reviews.title, reviews.body, users.first_name, users.last_name, reviews.body, reviews.positive_sentiment FROM reviews INNER JOIN users ON reviews.author_id = users.id WHERE reviews.author_id = ${req.params.author_id};
 	`;
@@ -22,17 +22,13 @@ router.get('/reviews/:author_id', async function (req, res) {
 });
 
 // Retrieves all reviews for authenticated user
-router.get(
-	'/reviews/:author_id',
-	checkAuthenticated,
-	async function (req, res) {
-		const reviews = await sql`
-		SELECT reviews.title, reviews.body, users.first_name, users.last_name, reviews.body, reviews.positive_sentiment FROM reviews INNER JOIN users ON reviews.author_id = users.id WHERE reviews.author_id = ${req.user.id};
+router.get('/reviews/user', checkAuthenticated, async function (req, res) {
+	const reviews = await sql`
+		SELECT reviews.title, reviews.body, users.first_name, users.last_name, reviews.body, reviews.positive_sentiment, reviews.id FROM reviews INNER JOIN users ON reviews.author_id = users.id WHERE reviews.author_id = ${req.user.id};
 	`;
 
-		res.send({ reviews });
-	}
-);
+	res.send({ reviews });
+});
 
 // Adds a new review - uses req.body for all data input
 router.post(
@@ -43,7 +39,8 @@ router.post(
 			const add_review = await sql`
 			INSERT INTO reviews (title, body, positive_sentiment, author_id, movie_id) VALUES (${req.body.title}, ${req.body.body}, ${req.body.positive}, ${req.user.id}, ${req.params.movie_id});
 		`;
-			res.send('Review added.');
+			req.flash('success', 'Review posted!');
+			res.redirect(`/movie/${req.params.movie_id}`);
 		} catch (e) {
 			console.log(e);
 			res.status(500).send('An error occurred.');
@@ -84,7 +81,8 @@ router.patch('/reviews/:id', checkAuthenticated, async function (req, res) {
 			req.body.positive || existing_review.positive_sentiment
 		} WHERE reviews.id = ${req.params.id};
 	`;
-		res.send('Review updated.');
+		req.flash('success', 'Review updated');
+		res.redirect(`/movie/${existing_review.movie_id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');
@@ -120,7 +118,8 @@ router.delete('/reviews/:id', checkAuthenticated, async function (req, res) {
 		const delete_review = await sql`
 		DELETE FROM reviews WHERE id = ${req.params.id};
 	`;
-		res.send('Review deleted.');
+		req.flash('success', 'Review deleted');
+		res.redirect(`/movie/${existing_review.movie_id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');

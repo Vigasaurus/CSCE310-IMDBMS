@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/header') %>
+
+	<body>
+		<%- include('partials/nav', {hideAuth: true, auth, messages}) %>
+
+		<section class="dark:bg-coolGray-800 dark:text-coolGray-100 opacity-0" id="content">
+			<div class="container px-6 py-12 mx-auto">
+				<div class="grid items-center gap-4 xl:grid-cols-5">
+					<div class="max-w-2xl mx-auto my-8 space-y-4 text-center xl:col-span-2 xl:text-left">
+						<h2 class="text-4xl font-bold" id="movie-title"></h2>
+						<p class="dark:text-coolGray-400" id="movie-genre"></p>
+						<form method="post" id="watchlist-form" action="">
+							<button type="submit" class="w-full px-8 py-3 rounded-md dark:bg-violet-400 dark:text-coolGray-900" id="form-button">Add to Watchlist</button>
+						</form>
+						<form method="post" id="like-form" action="">
+							<button type="submit" class="w-full px-8 py-3 rounded-md dark:bg-violet-400 dark:text-coolGray-900" id="like-button">Add to Liked List</button>
+						</form>
+						<div class="flex flex-col" action="">
+							<button class="w-full px-8 py-3 mb-2 rounded-md dark:bg-violet-400 dark:text-coolGray-900 hidden" id="watchlist-highlight-button">Move to top of Watchlist</button>
+							<button class="w-full px-8 py-3 rounded-md dark:bg-violet-400 dark:text-coolGray-900 hidden" id="like-highlight-button">Move to top of Liked List</button>
+						</div>
+					</div>
+					<div class="p-6 xl:col-span-3">
+						<div class="grid gap-4 md:grid-cols-2">
+							<div class="grid content-center gap-4">
+								<div class="p-6 rounded shadow-md dark:bg-coolGray-900 review-wrapper">
+									<p class="review-body"></p>
+									<div class="flex items-center mt-4 space-x-4">
+										<img src="https://source.unsplash.com/50x50/?portrait?1" alt="" class="w-12 h-12 bg-center bg-cover rounded-full dark:bg-coolGray-500">
+										<div>
+											<p class="text-lg font-semibold review-title"></p>
+											<a class="text-sm dark:text-coolGray-400 review-author"></a>
+										</div>
+									</div>
+								</div>
+								<div class="p-6 rounded shadow-md dark:bg-coolGray-900 review-wrapper">
+									<p class="review-body"></p>
+									<div class="flex items-center mt-4 space-x-4">
+										<img src="https://source.unsplash.com/50x50/?portrait?2" alt="" class="w-12 h-12 bg-center bg-cover rounded-full dark:bg-coolGray-500">
+										<div>
+											<p class="text-lg font-semibold review-title"></p>
+											<a class="text-sm dark:text-coolGray-400 review-author"></a>
+										</div>
+									</div>
+								</div>
+							</div>
+							<div class="grid content-center gap-4">
+								<div class="p-6 rounded shadow-md dark:bg-coolGray-900 review-wrapper">
+									<p class="review-body"></p>
+									<div class="flex items-center mt-4 space-x-4">
+										<img src="https://source.unsplash.com/50x50/?portrait?3" alt="" class="w-12 h-12 bg-center bg-cover rounded-full dark:bg-coolGray-500">
+										<div>
+											<p class="text-lg font-semibold review-title"></p>
+											<a class="text-sm dark:text-coolGray-400 review-author"></a>
+										</div>
+									</div>
+								</div>
+								<div class="p-6 rounded shadow-md dark:bg-coolGray-900 review-wrapper">
+									<p class="review-body"></p>
+									<div class="flex items-center mt-4 space-x-4">
+										<img src="https://source.unsplash.com/50x50/?portrait?4" alt="" class="w-12 h-12 bg-center bg-cover rounded-full dark:bg-coolGray-500">
+										<div>
+											<p class="text-lg font-semibold review-title"></p>
+											<a class="text-sm dark:text-coolGray-400 review-author"></a>
+										</div>
+									</div>
+								</div>
+								<div class="p-6 rounded shadow-md dark:bg-coolGray-900 empty-reviews hidden">
+									<p class="">This could be your review!</p>
+									<div class="flex items-center mt-4 space-x-4">
+										<img src="https://source.unsplash.com/50x50/?portrait?4" alt="" class="w-12 h-12 bg-center bg-cover rounded-full dark:bg-coolGray-500">
+										<div>
+											<p class="text-lg font-semibold">No reviews yet!</p>
+											<a class="text-sm dark:text-coolGray-400">Yours?</a>
+										</div>
+									</div>
+								</div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<form novalidate="" class="w-1/2 flex flex-col py-6 space-y-6 md:py-0 md:px-6 ng-untouched ng-pristine ng-valid" id="add-review" method="POST" action="">
+					<h2 class="text-4xl font-bold">Add a review!</h2>
+					<label class="block">
+						<span class="mb-1">Title</span>
+						<input name="title" type="text" placeholder="Great movie!" class="block w-full rounded-md shadow-sm focus:ring focus:ring-opacity-75 focus:ring-violet-400 dark:bg-coolGray-800">
+					</label>
+					<label class="block">
+						<span class="mb-1">Review</span>
+						<textarea name="body" rows="3" class="block w-full rounded-md focus:ring focus:ring-opacity-75 focus:ring-violet-400 dark:bg-coolGray-800"></textarea>
+					</label>
+					<input type="hidden" value="true" name="positive" />
+					<div>
+						<button type="submit" id="review-submit" class="self-center px-8 py-3 text-lg rounded focus:ring hover:ring focus:ring-opacity-75 dark:bg-violet-400 dark:text-coolGray-900 focus:ring-violet-400 hover:ring-violet-400">Submit</button>
+						<button id="review-delete" class="self-center px-8 py-3 text-lg rounded focus:ring hover:ring focus:ring-opacity-75 dark:bg-violet-400 dark:text-coolGray-900 focus:ring-violet-400 hover:ring-violet-400 hidden">Delete Review</button>
+					</div>
+				</form>
+			</div>
+		</section>
+
+		<%- include('partials/footer') %>
+		<p id="auth" class="hidden"><%= auth.id %></p>
+	</body>
+
+	<script>
+		window.addEventListener('load', () => {
+			const movie_id = parseInt(window.location.href.split('/')[4]);
+			const user_id = parseInt(document.getElementById('auth').innerText);
+			fetch(`/api/movies/${movie_id}`).then(response => response.json()).then(data => {
+				document.querySelector('#movie-title').textContent = data.movie.title;
+				document.querySelector('#movie-genre').textContent = data.movie.genre;
+
+			});
+
+			fetch(`/api/reviews/${movie_id}`).then(response => response.json()).then(data => {
+				if (data.reviews.length === 0) {
+					document.querySelector('.empty-reviews').classList.remove('hidden');
+					document.querySelectorAll('.review-wrapper').forEach(review => {
+						review.classList.add('hidden');
+					});
+					return;
+				}
+
+				const myReview = data.reviews.filter(item => item.author_id == user_id)[0]
+
+				if (myReview) {
+					document.querySelector('#add-review input').value = myReview.title;
+					document.querySelector('#add-review textarea').value = myReview.body;
+					document.querySelector('#add-review').action = 'javascript:void(0);';
+					document.querySelector('#review-submit').type = 'button';
+					document.querySelector('#review-submit').textContent = 'Update review';
+					document.querySelector('#review-delete').classList.remove('hidden');
+					document.querySelector('#review-submit').addEventListener('click', () => {
+						const urlencoded = new URLSearchParams();
+						urlencoded.append('title', document.querySelector('#add-review input').value);
+						urlencoded.append('body', document.querySelector('#add-review textarea').value);
+						urlencoded.append('positive', true);
+
+						fetch(`/api/reviews/${myReview.id}`, {method: 'PATCH', body: urlencoded});
+					});
+
+					document.querySelector('#review-delete').addEventListener('click', () => {
+						fetch(`/api/reviews/${myReview.id}`, {method: 'DELETE'});
+					});
+				} else {
+					document.getElementById('add-review').action = `/api/reviews/${movie_id}`;
+				}
+
+				document.querySelectorAll('.review-body').forEach((body, index) => {
+					body.textContent = data.reviews[index].body;
+				});
+				document.querySelectorAll('.review-title').forEach((title, index) => {
+					title.textContent = data.reviews[index].title;
+				});
+				document.querySelectorAll('.review-author').forEach((author, index) => {
+					author.textContent = data.reviews[index].first_name + ' ' + data.reviews[index].last_name;
+					author.href = `/profile/${data.reviews[index].author_id}`;
+				});
+			});
+
+
+			fetch('/api/watchlist').then(response => response.json()).then(data => {
+				if (data.watchlist.some(item => item.id == movie_id)) {
+					document.getElementById('form-button').textContent = "Remove from Watchlist";
+					document.getElementById('form-button').type = 'button';
+
+					const currentItem = data.watchlist.filter(item => item.id == movie_id)[0];
+					const minIndex = Math.min(...data.watchlist.map(item => item.index));
+
+					document.getElementById('form-button').addEventListener('click', () => {
+						fetch(`/api/watchlist/${currentItem.watch_id}`, {method: 'DELETE'});
+					})
+
+					if (data.watchlist.filter(item => item.index === minIndex).length > 1 || currentItem.index !== minIndex) {
+						document.getElementById('watchlist-highlight-button').classList.remove('hidden');
+						document.getElementById('watchlist-highlight-button').addEventListener('click', () => {
+							const urlencoded = new URLSearchParams();
+							urlencoded.append("index", minIndex-1);
+							fetch(`/api/watchlist/${currentItem.watch_id}`, {method: 'PATCH', body: urlencoded});
+						});
+					}
+				} else {
+					document.getElementById('watchlist-form').action = `/api/watchlist/${movie_id}`;
+				}
+
+				document.querySelector('#content').classList.remove('opacity-0');
+			});
+
+			fetch('/api/likes').then(response => response.json()).then(data => {
+				if (data.likes.some(item => item.id == movie_id)) {
+					document.getElementById('like-button').textContent = "Remove from Liked List";
+					document.getElementById('like-button').type = 'button';
+
+					const currentItem = data.likes.filter(item => item.id == movie_id)[0];
+					const minIndex = Math.min(...data.likes.map(item => item.index));
+
+					document.getElementById('like-button').addEventListener('click', () => {
+						fetch(`/api/likes/${currentItem.like_id}`, {method: 'DELETE'});
+					})
+
+					if (data.likes.filter(item => item.index === minIndex).length > 1 || currentItem.index !== minIndex) {
+						document.getElementById('like-highlight-button').classList.remove('hidden');
+						document.getElementById('like-highlight-button').addEventListener('click', () => {
+							const urlencoded = new URLSearchParams();
+							urlencoded.append("index", minIndex-1);
+							fetch(`/api/likes/${currentItem.like_id}`, {method: 'PATCH', body: urlencoded});
+						});
+					}
+				} else {
+					document.getElementById('like-form').action = `/api/likes/${movie_id}`;
+				}
+			});
+
+		});
+
+	</script>
+
+
+</html>

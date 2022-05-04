@@ -6,9 +6,10 @@ const sql = require('../postgres');
 // Gets watchlist for authenticated user
 router.get('/watchlist', checkAuthenticated, async function (req, res) {
 	const watchlist = await sql`
-		SELECT title, watches.index FROM movies
+		SELECT title, watches.index, watches.id as watch_id, movies.id FROM movies
 		JOIN watches ON movies.id = watches.movie_id
-		WHERE watches.user_id  =${req.user.id};
+		WHERE watches.user_id  =${req.user.id}
+		ORDER BY watches.index;
 	`;
 
 	res.send({ watchlist });
@@ -23,8 +24,8 @@ router.post(
 			const query = await sql`
 		INSERT INTO watches (user_id, movie_id, index) VALUES (${req.user.id}, ${req.params.movie_id}, 1)
 	`;
-
-			res.send('Watchlist item added.');
+			req.flash('success', 'Movie added to your watchlist');
+			res.redirect(`/movie/${req.params.movie_id}`);
 		} catch (e) {
 			console.log(e);
 			res.status(500).send('An error occurred.');
@@ -62,10 +63,11 @@ router.patch('/watchlist/:id', checkAuthenticated, async function (req, res) {
 	try {
 		await sql`
 			UPDATE watches
-			SET index = ${req.body.index || existing_like.index}
+			SET index = ${req.body.index || existing_watchlist_item.index}
 			WHERE id = ${req.params.id};
 		`;
-		res.send('Watchlist item updated.');
+		req.flash('success', 'Movie moved to the top of your watchlist');
+		res.redirect(`/movie/${existing_watchlist_item.movie_id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');
@@ -103,7 +105,9 @@ router.delete('/watchlist/:id', checkAuthenticated, async function (req, res) {
 		await sql`
 		DELETE FROM watches WHERE id = ${req.params.id};
 	`;
-		res.send('Watchlist item deleted.');
+
+		req.flash('success', 'Movie removed from your watchlist');
+		res.redirect(`/movie/${existing_watchlist_item.movie_id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');

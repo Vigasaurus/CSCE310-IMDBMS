@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/header') %>
+
+	<body>
+		<%- include('partials/nav', {hideAuth: true, auth, messages}) %>
+
+		<section class="px-7 py-5 dark:bg-coolGray-800 dark:text-coolGray-100 opacity-0 transition duration-500" id="content">
+			<div class="container grid grid-cols-12 mx-auto gap-y-6 md:gap-10">
+				<div class="flex flex-col justify-between col-span-12 py-2 space-y-8 md:space-y-16 md:col-span-3">
+					<div class="flex flex-col space-y-8 md:space-y-12">
+						<div class="flex flex-col space-y-2">
+							<h3 class="flex items-center space-x-2 dark:text-coolGray-400">
+								<span class="flex-shrink-0 w-2 h-2 uppercase rounded-full dark:bg-violet-400"></span>
+								<span class="text-xs font-bold tracking-wider uppercase">Featured Movie</span>
+							</h3>
+							<a rel="noopener noreferrer" class="font-serif hover:underline featured-movie-title">Movie Title</a>
+							<p class="text-xs dark:text-coolGray-400"><span class="minutes-diff">47</span> minutes ago in
+								<span rel="noopener noreferrer" class="hover:underline dark:text-violet-400 featured-genre-input">Genre</span>
+							</p>
+						</div>
+						<div class="flex flex-col space-y-2">
+							<h3 class="flex items-center space-x-2 dark:text-coolGray-400">
+								<span class="flex-shrink-0 w-2 h-2 uppercase rounded-full dark:bg-violet-400"></span>
+								<span class="text-xs font-bold tracking-wider uppercase">Featured Movie</span>
+							</h3>
+							<a rel="noopener noreferrer" class="font-serif hover:underline featured-movie-title">Movie Title</a>
+							<p class="text-xs dark:text-coolGray-400"><span class="hours-diff">2</span> hours ago in
+								<span rel="noopener noreferrer" class="hover:underline dark:text-violet-400 featured-genre-input">Genre</span>
+							</p>
+						</div>
+						<div class="flex flex-col space-y-2">
+							<h3 class="flex items-center space-x-2 dark:text-coolGray-400">
+								<span class="flex-shrink-0 w-2 h-2 uppercase rounded-full dark:bg-violet-400"></span>
+								<span class="text-xs font-bold tracking-wider uppercase">Featured Movie</span>
+							</h3>
+							<a rel="noopener noreferrer" class="font-serif hover:underline featured-movie-title">Movie Title</a>
+							<p class="text-xs dark:text-coolGray-400"><span class="hours-diff">4</span> hours ago in
+								<span rel="noopener noreferrer" class="hover:underline dark:text-violet-400 featured-genre-input">Genre</span>
+							</p>
+						</div><!---->
+					</div>
+					<div class="flex flex-col w-full space-y-2">
+						<div class="flex w-full h-1 bg-opacity-10 dark:bg-violet-400">
+							<div class="w-1/2 h-full dark:bg-violet-400"></div>
+						</div>
+						<a rel="noopener noreferrer" href="#" class="flex items-center justify-between w-full">
+							<span class="text-xs font-bold tracking-wider uppercase">Stay tuned for more featured movies!</span>
+								<line x1="5" y1="12" x2="19" y2="12"></line>
+								<polyline points="12 5 19 12 12 19"></polyline>
+							</svg>
+						</a>
+					</div>
+				</div>
+				<div class="relative flex col-span-12 bg-center bg-no-repeat bg-cover dark:bg-coolGray-500 xl:col-span-6 lg:col-span-5 md:col-span-9 min-h-96 items-center justify-center">
+					<a class="flex flex-col items-center justify-end p-6 text-center sm:p-8 group dark:via-transparent flex-grow-1 bg-gradient-to-b dark:from-coolGray-900 dark:to-coolGray-900">
+						<h1 rel="noopener noreferrer" href="#" class=" text-2xl font-semibold group-hover:underline dark:text-coolGray-100">IMDBMS Dashboard - Movies, found.</h1>
+					</a>
+				</div>
+				<div class="hidden py-2 xl:col-span-3 lg:col-span-4 md:hidden lg:block">
+					<div class="mb-8 space-x-5 border-b-2 border-opacity-10 dark:border-violet-400">
+						<button type="button" class="pb-5 text-xs font-bold uppercase border-b-2 border-violet-400" id="watchlist">Watchlist</button>
+						<button type="button" class="pb-5 text-xs font-bold uppercase border-b-2 border-transparent" id="following">Following</button>
+					</div>
+					<div class="flex flex-col divide-y divide-coolGray-700 transition" id="watchlist-content">
+						<div class="flex px-1 py-8 hidden" id="empty-watchlist">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="" class="font-serif hover:underline">Your watchlist is currently empty!</a>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 watchlist-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline watchlist-movie-title">Aenean ac tristique lorem, ut mollis dui.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline watchlist-genre-input">Politics</span>
+								</p>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 watchlist-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline watchlist-movie-title">Nulla consectetur efficitur.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline watchlist-genre-input">Sports</span>
+								</p>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 watchlist-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline watchlist-movie-title">Vitae semper augue purus tincidunt libero.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline watchlist-genre-input">World</span>
+								</p>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 watchlist-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline watchlist-movie-title">Suspendisse potenti.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline watchlist-genre-input">Business</span>
+								</p>
+							</div>
+						</div><!---->
+					</div>
+					<div class="flex flex-col divide-y divide-coolGray-700 transition hidden" id="following-content">
+						<div class="flex px-1 py-8 hidden" id="empty-follow">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="" class="font-serif hover:underline">You currently don't follow anyone!</a>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 follow-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline follow-title">Aenean ac tristique lorem, ut mollis dui.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">5 minutes ago
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline follow-status-input">Politics</span>
+								</p>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 follow-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline follow-title">Nulla consectetur efficitur.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline follow-status-input">Sports</span>
+								</p>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 follow-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline follow-title">Vitae semper augue purus tincidunt libero.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline follow-status-input">World</span>
+								</p>
+							</div>
+						</div>
+						<div class="flex px-1 py-4 follow-inner-content">
+							<div class="flex flex-col flex-grow">
+								<a rel="noopener noreferrer" href="#" class="font-serif hover:underline follow-title">Suspendisse potenti.</a>
+								<p class="mt-auto text-xs dark:text-coolGray-400">
+									<span rel="noopener noreferrer" href="#" class="block dark:text-blue-400 lg:ml-2 lg:inline hover:underline follow-status-input">Business</span>
+								</p>
+							</div>
+						</div><!---->
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<%- include('partials/footer') %>
+	</body>
+
+	<script>
+		window.addEventListener('load', () => {
+			fetch('/api/featured').then(response => response.json()).then(data => {
+				document.querySelectorAll('.featured-genre-input').forEach((genre, index) => {
+					genre.textContent = data.featured_movies[index].genre;
+				});
+				document.querySelectorAll('.featured-movie-title').forEach((title, index) => {
+					title.textContent = data.featured_movies[index].title;
+					title.href = `/movie/${data.featured_movies[index].id}`;
+				});
+				document.querySelector('.minutes-diff').textContent = Math.floor(Math.random()*35 + 24);
+				document.querySelectorAll('.hours-diff').forEach(diff => {
+					diff.textContent = Math.floor(Math.random()*4 + 2);
+				});
+
+				document.querySelector('#content').classList.remove('opacity-0');
+			});
+
+			fetch('/api/watchlist').then(response => response.json()).then(data => {
+				console.log(data);
+				if (data.watchlist.length === 0) {
+					document.querySelectorAll('.watchlist-inner-content').forEach(content => {
+						content.classList.add('hidden');
+					});
+					document.getElementById('empty-watchlist').classList.remove('hidden');
+					return;
+				}
+
+				document.querySelectorAll('.watchlist-inner-content').forEach((content, index) => {
+					if (index >= data.watchlist.length) {
+						content.classList.add('hidden');
+					}
+				});
+
+				[...document.querySelectorAll('.watchlist-genre-input')].slice(0,data.watchlist.length).forEach((genre, index) => {
+					genre.textContent = data.watchlist[index].genre;
+				});
+				[...document.querySelectorAll('.watchlist-movie-title')].slice(0,data.watchlist.length).forEach((title, index) => {
+					title.textContent = data.watchlist[index].title;
+					title.href = `/movie/${data.watchlist[index].id}`;
+				});
+			});
+
+			fetch('/api/followers').then(response => response.json()).then(data => {
+				console.log(data)
+				if (data.follows.length === 0) {
+					document.querySelectorAll('.follow-inner-content').forEach(content => {
+						content.classList.add('hidden');
+					});
+					document.getElementById('empty-follow').classList.remove('hidden');
+					return;
+				}
+
+				document.querySelectorAll('.follow-inner-content').forEach((content, index) => {
+					if (index >= data.follows.length) {
+						content.classList.add('hidden');
+					}
+				});
+
+				[...document.querySelectorAll('.follow-status-input')].slice(0,data.follows.length).forEach((status, index) => {
+					status.textContent = data.follows[index].accepted ? 'Accepted' : 'Unaccepted';
+				});
+				[...document.querySelectorAll('.follow-title')].slice(0,data.follows.length).forEach((title, index) => {
+					title.textContent = data.follows[index].title || "";
+					title.href = data.follows[index] ? `/movie/${data.follows[index].id}` : "";
+				});
+			});
+
+			document.getElementById('watchlist').addEventListener('click', () => {
+				document.getElementById('watchlist').classList.remove('border-transparent');
+				document.getElementById('watchlist').classList.add('border-violet-400');
+
+				document.getElementById('following').classList.remove('border-violet-400');
+				document.getElementById('following').classList.add('border-transparent');
+
+				document.getElementById('watchlist-content').classList.remove('hidden');
+				document.getElementById('following-content').classList.add('hidden');
+			});
+
+			document.getElementById('following').addEventListener('click', () => {
+				document.getElementById('following').classList.remove('border-transparent');
+				document.getElementById('following').classList.add('border-violet-400');
+
+				document.getElementById('watchlist').classList.remove('border-violet-400');
+				document.getElementById('watchlist').classList.add('border-transparent');
+
+				document.getElementById('watchlist-content').classList.add('hidden');
+				document.getElementById('following-content').classList.remove('hidden');
+			});
+		});
+	</script>
+
+</html>

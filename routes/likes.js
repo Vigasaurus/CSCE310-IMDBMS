@@ -7,7 +7,7 @@ const { checkAuthenticated } = require('../middleware');
 // Returns all likes for currently logged in user
 router.get('/likes', checkAuthenticated, async function (req, res) {
 	const likes = await sql`
-		SELECT title, likes.index FROM movies
+		SELECT title, likes.index, likes.id as like_id, movies.id as id FROM movies
 		JOIN likes ON movies.id = likes.movie_id
 		WHERE likes.user_id  =${req.user.id};
 	`;
@@ -34,7 +34,8 @@ router.post('/likes/:movie_id', checkAuthenticated, async function (req, res) {
 			INSERT INTO likes(user_id, movie_id, index)
 			VALUES ( ${req.user.id}, ${req.params.movie_id}, 1);
 		`;
-		res.send('Like added.');
+		req.flash('success', 'Movie added to your liked list');
+			res.redirect(`/movie/${req.params.movie_id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');
@@ -72,7 +73,8 @@ router.patch('/likes/:id', checkAuthenticated, async function (req, res) {
 		SET index = ${req.body.index || existing_like.index}
 		WHERE id = ${req.params.id};
 	`;
-		res.send('Like updated.');
+	req.flash('success', 'Movie moved to the top of your liked list');
+	res.redirect(`/movie/${existing_like.movie_id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');
@@ -108,7 +110,8 @@ router.delete('/likes/:id', async function (req, res) {
 		await sql`
 		DELETE FROM likes WHERE id = ${req.params.id};
 	`;
-		res.send('Like deleted.');
+	req.flash('success', 'Movie removed from your liked list');
+	res.redirect(`/movie/${existing_like.movie_id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');

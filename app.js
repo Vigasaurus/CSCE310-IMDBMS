@@ -7,6 +7,7 @@ const methodOverride = require('method-override');
 const initPassport = require('./passport-config');
 const passport = require('passport');
 const sql = require('./postgres');
+const flash = require('express-flash');
 
 const baseRoutes = require('./routes');
 const userRoutes = require('./routes/users');
@@ -21,6 +22,7 @@ const watchlistRoutes = require('./routes/watchlist');
 initPassport(passport);
 
 app.use(bodyParser.urlencoded({ extended: true }));
+app.use(flash());
 app.set('view engine', 'ejs');
 app.use(express.static(__dirname + '/public'));
 app.use(methodOverride('_method'));
@@ -31,6 +33,11 @@ app.use(
 		saveUninitialized: false,
 	})
 );
+
+app.use(function (req, res, next) {
+	res.set('Cache-control', `no-store`);
+	next();
+});
 
 app.use(passport.initialize());
 app.use(passport.session());
@@ -46,7 +53,7 @@ app.use('/api', reviewsRoutes);
 app.use('/api', watchlistRoutes);
 
 app.get('/*', function (req, res) {
-	res.render('404');
+	res.render('404', {auth: req.user});
 });
 
 const PORT = process.env.PORT || 8000;

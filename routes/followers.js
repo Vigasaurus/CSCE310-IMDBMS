@@ -7,7 +7,7 @@ const sql = require('../postgres');
 // Get all followers for authenticated user
 router.get('/followers', checkAuthenticated, async function (req, res) {
 	const follows = await sql`
-		SELECT first_name, last_name, accepted FROM users
+		SELECT first_name, last_name, accepted, followed_id, follows.id FROM users
 		JOIN follows ON users.id = follows.followed_id
 		WHERE follower_id = ${req.user.id};
 	`;
@@ -20,7 +20,7 @@ router.get(
 	checkAuthenticated,
 	async function (req, res) {
 		const follow_requests = await sql`
-		SELECT first_name, last_name, accepted, follows.id FROM users
+		SELECT first_name, last_name, accepted, follows.id, follower_id FROM users
 		JOIN follows ON users.id = follows.follower_id
 		WHERE followed_id = ${req.user.id};
 	`;
@@ -44,7 +44,8 @@ router.post('/followers/:user_id', async function (req, res) {
 			INSERT INTO follows(follower_id, followed_id, accepted)
 			VALUES (  ${req.user.id},  ${req.params.user_id},  false);
 		`;
-		res.send('Follow request sent!');
+		req.flash('success', 'Follow request sent!');
+		res.redirect(`/profile/${req.params.user_id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');
@@ -71,9 +72,10 @@ router.patch('/followers/:id', checkAuthenticated, async function (req, res) {
 		await sql`
 		UPDATE follows
 		SET accepted = true
-		WHERE follower_id = ${req.params.id};
+		WHERE id = ${req.params.id};
 	`;
-		res.send('Follow request accepted!');
+	req.flash('success', 'Follow request accepted!');
+	res.redirect(`/profile/${req.user.id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');
@@ -92,7 +94,7 @@ router.delete('/followers/:id', checkAuthenticated, async function (req, res) {
 			return;
 		}
 
-		if (existing_follow[0].follower_id !== req.user.id) {
+		if (existing_follow[0].follower_id !== req.user.id && existing_follow[0].followed_id !== req.user.id) {
 			res.status(400).send('You are not authorized to delete this follow.');
 			return;
 		}
@@ -100,7 +102,8 @@ router.delete('/followers/:id', checkAuthenticated, async function (req, res) {
 		await sql`
 		DELETE FROM follows WHERE follows.id = ${req.params.id};
 	`;
-		res.send('Follow deleted.');
+	req.flash('success', 'Follow deleted!');
+	res.redirect(`/profile/${existing_follow[0].followed_id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');

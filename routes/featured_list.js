@@ -20,7 +20,7 @@ router.get('/featured', async function (req, res) {
 	}
 
 	const featured_movies = await sql`
-		SELECT movies.title, movies.genre, movies.runtime, index FROM featured_movies
+		SELECT movies.title, movies.genre, movies.runtime, index, movies.id FROM featured_movies
 		INNER JOIN movies ON featured_movies.movie_id = movies.id
 		WHERE week = ${maxWeek}
 		ORDER BY index;

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('partials/header') %>
+
+	<body>
+		<%- include('partials/nav', {hideAuth: true}) %>
+
+		<div id="content" class="container mx-auto" style="min-height: calc(100vh - 14rem);">
+			<div class="flex flex-col justify-center items-center">
+				<div class="flex flex-col max-w-lg p-6 rounded-md sm:p-10 dark:bg-coolGray-900 dark:text-coolGray-100">
+					<div class="mb-8 text-center">
+						<h1 class="my-3 text-4xl font-bold">Sign in</h1>
+						<p class="text-sm dark:text-coolGray-400">Sign in to access your account</p>
+					</div>
+					<form novalidate="" action="/api/login" class="space-y-12 ng-untouched ng-pristine ng-valid" method="post">
+						<div class="space-y-4">
+							<div>
+								<label for="email" class="block mb-2 text-sm">Email address</label>
+								<input type="email" name="email" id="email" placeholder="leroy@jenkins.com" class="w-full px-3 py-2 border rounded-md dark:border-coolGray-700 dark:bg-coolGray-900 dark:text-coolGray-100">
+							</div>
+							<div>
+								<div class="flex justify-between mb-2">
+									<label for="password" class="text-sm">Password</label>
+								</div>
+								<input type="password" name="password" id="password" placeholder="*****" class="w-full px-3 py-2 border rounded-md dark:border-coolGray-700 dark:bg-coolGray-900 dark:text-coolGray-100">
+							</div>
+						</div>
+						<div class="space-y-2">
+							<div>
+								<button type="submit" class="w-full px-8 py-3 rounded-md dark:bg-violet-400 dark:text-coolGray-900">Sign in</button>
+							</div>
+							<p class="px-6 text-sm text-center dark:text-coolGray-400">Don't have an account yet?
+								<a rel="noopener noreferrer" href="/signup" class="hover:underline dark:text-violet-400">Sign up</a>.
+							</p>
+						</div>
+					</form>
+				</div>
+			</div>
+		</div>
+
+		<script src="/scripts/index.js"></script>
+		<%- include('partials/footer') %>
+	</body>
+
+</html>

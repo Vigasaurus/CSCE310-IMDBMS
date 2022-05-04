@@ -9,8 +9,9 @@ router.post(
 	'/login',
 	checkNotAuthenticated,
 	passport.authenticate('local', {
-		successRedirect: '/movies',
+		successRedirect: '/dashboard',
 		failureRedirect: '/login',
+		failureFlash: true
 	})
 );
 
@@ -20,7 +21,8 @@ router.post('/signup', checkNotAuthenticated, async function (req, res) {
 			(value) => !value
 		)
 	) {
-		res.status(400).send('Missing required fields.');
+		req.flash('error', 'Missing required fields');
+		res.redirect('/signup');
 		return;
 	}
 
@@ -35,6 +37,7 @@ router.post('/signup', checkNotAuthenticated, async function (req, res) {
 					req.body.first_name
 				}, ${req.body.last_name || ''}, ${req.body.email}, ${hashedPassword}, false);
 			`;
+		req.flash('success', 'Account created successfully, login above.');
 		res.redirect('/login');
 	} catch (e) {
 		res.status(400).send(e);
@@ -49,7 +52,7 @@ router.get('/logout', checkAuthenticated, (req, res) => {
 // Returns the user object except the passwordhash
 router.get('/users/:id', async function (req, res) {
 	const users = await sql`
-		SELECT first_name, last_name, email, isadmin FROM users where id = ${req.params.id};
+		SELECT first_name, last_name, email, isadmin, id FROM users where id = ${req.params.id};
 	`;
 
 	if (users.length) res.send({ users: users[0] });
@@ -85,20 +88,23 @@ router.patch('/users', checkAuthenticated, async function (req, res) {
 			req.body.first_name || existing_user.first_name
 		}, last_name = ${req.body.last_name || existing_user.last_name}, email = ${req.body.email || existing_user.email}, password_hash = ${hashedPassword} WHERE users.id = ${req.user.id};
 	`;
-		res.send('Profile updated.');
+	req.flash('success', 'Profile updated!');
+	res.redirect(`/profile/${req.user.id}`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');
 	}
 });
 
-// Deletes a user - uses req.params.id for user id from url
-router.delete('/user/:id', checkAuthenticated, async function (req, res) {
+// Deletes authenticated user
+router.delete('/users', checkAuthenticated, async function (req, res) {
 	try {
 		await sql`
 		DELETE from users WHERE users.id = ${req.user.id};
 	`;
-		res.send('Profile updated.');
+	req.flash('success', 'Account deleted!');
+	req.logOut();
+	res.redirect(`/login`);
 	} catch (e) {
 		console.log(e);
 		res.status(500).send('An error occurred.');
